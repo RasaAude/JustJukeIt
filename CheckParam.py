@@ -1,6 +1,7 @@
 from fitparse import FitFile
 from collections import defaultdict
-
+#check if this push worked
+#and check the commit
 def analyze_fit_file(file_path):
     fitfile = FitFile(file_path)
     
