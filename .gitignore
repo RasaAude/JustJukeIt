@@ -1,0 +1,4 @@
+**/*.fit
+40_min_dir
+__pycache__
+workout_database
