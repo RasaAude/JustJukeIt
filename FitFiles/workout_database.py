@@ -96,27 +96,3 @@ class WorkoutDatabase:
             return workout_df.loc[start_of_day:end_of_day]
         return None
 
-# Usage example
-workout_db = WorkoutDatabase()
-
-# Add workouts
-workout_db.add_workout('al4574', '40_Min', '92365581.fit')
-# You can add more workouts of the same type on different dates
-# workout_db.add_workout('al4574', '40_Min', 'another_40_min_workout.fit')
-
-# Retrieve workouts
-print(workout_db.get_workout('al4574', '40_Min'))
-all_al4574_workouts = workout_db.get_all_workouts('al4574')
-
-# List athletes and workouts
-#print(workout_db.list_athletes())
-print(workout_db.list_workouts('al4574'))
-
-dates = workout_db.get_workout_dates('al4574', '40_Min')
-print("Dates for al4574's 40_Min workouts:", dates)
-
-# Get a specific workout instance by date
-if dates:
-    specific_workout = workout_db.get_workout_by_date('al4574', '40_Min', dates[0])
-    print(f"Workout data for al4574's 40_Min workout on {dates[0]}:")
-    print(specific_workout)
