@@ -110,9 +110,3 @@ def update_workout_database(service, db):
                 os.remove(local_file_path)
 
     print("Workout database updated successfully")
-
-# Usage example
-if __name__ == '__main__':
-    service = get_drive_service()  # Assuming you have this function from previous setup
-    db = WorkoutDatabase()  # Initialize your database
-    update_workout_database(service, db)
