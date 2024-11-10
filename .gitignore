@@ -1,4 +1,5 @@
 **/*.fit
-40_min_dir
+**/*.json
+**/*.env
 __pycache__
 workout_database
