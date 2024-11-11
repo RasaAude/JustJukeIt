@@ -1,5 +1,6 @@
-.env
-config.json
+secret.env
+credentials.json
+token.json
 *.log
 /node_modules
 __pycache__
