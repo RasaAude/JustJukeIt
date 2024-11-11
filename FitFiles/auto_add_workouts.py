@@ -6,9 +6,6 @@ def main():
     # Get the Drive service
     service = drive_api.get_drive_service()
     
-       # Get the Drive service
-    service = drive_api.get_drive_service()
-    
     # Initialize your workout database
     db = WorkoutDatabase()  # Make sure this is properly initialized
     

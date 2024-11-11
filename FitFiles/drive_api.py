@@ -9,16 +9,13 @@ import io
 import os
 from datetime import datetime, timedelta
 # If modifying these scopes, delete the file token.json.
-SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
+SCOPES = ['https://www.googleapis.com/auth/drive']
 
 def get_drive_service():
     creds = None
-    # The file token.json stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first time.
     if os.path.exists('token.json'):
         creds = Credentials.from_authorized_user_file('token.json', SCOPES)
     
-    # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
@@ -26,7 +23,6 @@ def get_drive_service():
             flow = InstalledAppFlow.from_client_secrets_file(
                 'credentials.json', SCOPES)
             creds = flow.run_local_server(port=0)
-        # Save the credentials for the next run
         with open('token.json', 'w') as token:
             token.write(creds.to_json())
 
@@ -73,6 +69,37 @@ def download_file(service, file_id, file_name):
     with open(file_name, 'wb') as f:
         f.write(fh.read())
     return file_name
+
+def create_workout_folder(service, folder_name):
+    # Get the Workout_Data folder ID
+    workout_data_id = get_folder_id(service, 'Workout_Data')
+    if not workout_data_id:
+        print("Workout_Data folder not found")
+        return None
+
+    # Create the new folder
+    folder_metadata = {
+        'name': folder_name,
+        'mimeType': 'application/vnd.google-apps.folder',
+        'parents': [workout_data_id]
+    }
+    folder = service.files().create(body=folder_metadata, fields='id').execute()
+    new_folder_id = folder.get('id')
+
+    # List of sub-folders to create
+    sub_folders = ['40_Min', '20_Min', '5_Min', '3_Min', '2K', '6K']
+
+    # Create sub-folders
+    for sub_folder in sub_folders:
+        sub_folder_metadata = {
+            'name': sub_folder,
+            'mimeType': 'application/vnd.google-apps.folder',
+            'parents': [new_folder_id]
+        }
+        service.files().create(body=sub_folder_metadata).execute()
+
+    print(f"Created folder '{folder_name}' with sub-folders in Workout_Data")
+    return new_folder_id
 
 def update_workout_database(service, db):
     # Get the Workout_Data folder ID
