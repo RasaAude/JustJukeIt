@@ -1,6 +1,6 @@
 import drive_api
 service = drive_api.get_drive_service()
-'''unis = [
+unis = [
     "agw2135",
     "ahk2181",
     "al4574",
@@ -35,8 +35,8 @@ service = drive_api.get_drive_service()
     "scs2269",
     "suf2102",
     "wg2445"
-]'''
-#for uni in unis:
-    #drive_api.create_workout_folder(service, uni)
+]
+for uni in unis:
+    drive_api.create_workout_folder(service, uni)
 
-drive_api.add_folder_to_all_subfolders(service, "10_Min")
+#drive_api.add_folder_to_all_subfolders(service, "10_Min")

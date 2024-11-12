@@ -76,7 +76,11 @@ def create_workout_folder(service, folder_name):
     if not workout_data_id:
         print("Workout_Data folder not found")
         return None
-
+    # Check if the folder already exists
+    if check_folder_exists(service, workout_data_id, folder_name):
+        print(f"Folder '{folder_name}' already exists in Workout_Data.")
+        return None
+    
     # Create the new folder
     folder_metadata = {
         'name': folder_name,
@@ -128,6 +132,11 @@ def add_folder_to_all_subfolders(service, new_folder_name):
         print(f"Created folder '{new_folder_name}' in subfolder '{subfolder_name}'")
 
     print(f"Added '{new_folder_name}' to all subfolders in Workout_Data")
+    
+def check_folder_exists(service, parent_folder_id, folder_name):
+    query = "mimeType='application/vnd.google-apps.folder' and name='{}' and '{}' in parents".format(folder_name, parent_folder_id)
+    results = service.files().list(q=query, fields='files(id, name)').execute()
+    return len(results.get('files', [])) > 0
 
 def update_workout_database(service, db):
     # Get the Workout_Data folder ID
