@@ -87,7 +87,7 @@ def create_workout_folder(service, folder_name):
     new_folder_id = folder.get('id')
 
     # List of sub-folders to create
-    sub_folders = ['40_Min', '20_Min', '5_Min', '3_Min', '2K', '6K']
+    sub_folders = ['40_Min', '20_Min', '5_Min', '3_Min', '10_Min' '2K', '6K']
 
     # Create sub-folders
     for sub_folder in sub_folders:
@@ -100,6 +100,34 @@ def create_workout_folder(service, folder_name):
 
     print(f"Created folder '{folder_name}' with sub-folders in Workout_Data")
     return new_folder_id
+
+def add_folder_to_all_subfolders(service, new_folder_name):
+    # Get the Workout_Data folder ID
+    workout_data_id = get_folder_id(service, 'Workout_Data')
+    if not workout_data_id:
+        print("Workout_Data folder not found")
+        return
+
+    # Query to get all subfolders of Workout_Data
+    query = f"'{workout_data_id}' in parents and mimeType='application/vnd.google-apps.folder'"
+    results = service.files().list(q=query, fields="files(id, name)").execute()
+    subfolders = results.get('files', [])
+
+    for subfolder in subfolders:
+        subfolder_id = subfolder['id']
+        subfolder_name = subfolder['name']
+        
+        # Create new folder in each subfolder
+        new_folder_metadata = {
+            'name': new_folder_name,
+            'mimeType': 'application/vnd.google-apps.folder',
+            'parents': [subfolder_id]
+        }
+        new_folder = service.files().create(body=new_folder_metadata, fields='id').execute()
+        
+        print(f"Created folder '{new_folder_name}' in subfolder '{subfolder_name}'")
+
+    print(f"Added '{new_folder_name}' to all subfolders in Workout_Data")
 
 def update_workout_database(service, db):
     # Get the Workout_Data folder ID
