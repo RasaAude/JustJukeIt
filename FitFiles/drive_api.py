@@ -183,3 +183,35 @@ def update_workout_database(service, db):
         print("Workout database updated successfully")
     else:
         print("No recent files found for update")
+
+def share_athlete_folders(service):
+    workout_data_id = get_folder_id(service, 'Workout_Data')
+    if not workout_data_id:
+        print("Workout_Data folder not found")
+        return
+
+    # List all athlete folders within Workout_Data
+    athlete_folders = list_folders(service, workout_data_id)
+
+    for athlete_folder in athlete_folders:
+        athlete_id = athlete_folder['name']
+        athlete_folder_id = athlete_folder['id']
+        athlete_email = f"{athlete_id}@columbia.edu"
+
+        # Set up the permission
+        user_permission = {
+            'type': 'user',
+            'role': 'writer',
+            'emailAddress': athlete_email
+        }
+
+        try:
+            # Share the folder with the athlete
+            service.permissions().create(
+                fileId=athlete_folder_id,
+                body=user_permission,
+                sendNotificationEmail=True
+            ).execute()
+            print(f"Shared folder for athlete {athlete_id} with {athlete_email}")
+        except Exception as e:
+            print(f"Error sharing folder for athlete {athlete_id}: {str(e)}")

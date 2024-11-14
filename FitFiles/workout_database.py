@@ -86,18 +86,12 @@ class WorkoutDatabase:
         return list(self.workouts.get(athlete_id, {}).keys())
     
     def get_workout_dates(self, athlete_id, workout_type):
-        """
-        Get all dates for a specific workout type for an athlete as tuples.
-        """
         workout_df = self.get_workout(athlete_id, workout_type)
         if workout_df is not None:
             return sorted(set((date.year, date.month, date.day) for date in workout_df.index.date))
         return []
 
     def get_workout_by_date(self, athlete_id, workout_type, date):
-        """
-        Get a specific workout instance by date.
-        """
         workout_df = self.get_workout(athlete_id, workout_type)
         if workout_df is not None:
             if isinstance(date, tuple) and len(date) == 3:
