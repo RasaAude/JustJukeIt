@@ -1,6 +1,8 @@
 import pandas as pd
 import os
 from fitparse import FitFile
+import gzip
+import shutil
 
 class WorkoutDatabase:
     def __init__(self, database_dir='workout_database'):
@@ -29,6 +31,18 @@ class WorkoutDatabase:
         df.to_parquet(file_path)
 
     def add_workout(self, athlete_id, workout_type, fit_file_path):
+        
+        if fit_file_path.endswith('.fit.gz'):
+            # Create a temporary .fit file to store the unzipped contents
+            temp_fit_path = fit_file_path.replace('.fit.gz', '.fit')
+            
+            # Unzip the .fit.gz file
+            with gzip.open(fit_file_path, 'rb') as f_in:
+                with open(temp_fit_path, 'wb') as f_out:
+                    shutil.copyfileobj(f_in, f_out)
+            
+            # Use the temporary .fit file for processing
+            fit_file_path = temp_fit_path        
         # Load and process the FIT file
         fitfile = FitFile(fit_file_path)
         records = []

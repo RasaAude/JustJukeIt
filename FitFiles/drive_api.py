@@ -132,45 +132,54 @@ def add_folder_to_all_subfolders(service, new_folder_name):
         print(f"Created folder '{new_folder_name}' in subfolder '{subfolder_name}'")
 
     print(f"Added '{new_folder_name}' to all subfolders in Workout_Data")
-    
+
 def check_folder_exists(service, parent_folder_id, folder_name):
     query = "mimeType='application/vnd.google-apps.folder' and name='{}' and '{}' in parents".format(folder_name, parent_folder_id)
     results = service.files().list(q=query, fields='files(id, name)').execute()
     return len(results.get('files', [])) > 0
 
 def update_workout_database(service, db):
-    # Get the Workout_Data folder ID
     workout_data_id = get_folder_id(service, 'Workout_Data')
     if not workout_data_id:
         print("Workout_Data folder not found")
         return
 
-    # Set time threshold (e.g., 24 hours ago)
-    time_threshold = datetime.utcnow() - timedelta(hours=24)
-
-    # List athlete folders
+    time_threshold = datetime.utcnow() - timedelta(hours=72)
     athlete_folders = list_folders(service, workout_data_id)
+    files_within_threshold = False
 
     for athlete_folder in athlete_folders:
         athlete_id = athlete_folder['name']
-        
-        # List workout type folders
         workout_type_folders = list_folders(service, athlete_folder['id'])
         
+        athlete_has_recent_files = False
         for workout_type_folder in workout_type_folders:
             workout_type = workout_type_folder['name']
-            
-            # List new files in the workout type folder
             new_files = list_files(service, workout_type_folder['id'], time_threshold)
             
+            if new_files:
+                files_within_threshold = True
+                athlete_has_recent_files = True
+            
             for file in new_files:
-                # Download the file
                 local_file_path = download_file(service, file['id'], file['name'])
                 
-                # Add the workout to the database
+                print(f"Adding {athlete_id}'s {workout_type} with file path {local_file_path}")
                 db.add_workout(athlete_id, workout_type, local_file_path)
                 
-                # Optionally, delete the local file after adding to the database
-                os.remove(local_file_path)
+                # Delete the local file immediately after adding to the database
+                try:
+                    os.remove(local_file_path)
+                    print(f"Deleted local file: {local_file_path}")
+                except Exception as e:
+                    print(f"Error deleting {local_file_path}: {str(e)}")
 
-    print("Workout database updated successfully")
+        if not athlete_has_recent_files and files_within_threshold:
+            # If we've processed files for some athletes but this athlete has no recent files,
+            # we can stop processing further athletes
+            break
+
+    if files_within_threshold:
+        print("Workout database updated successfully")
+    else:
+        print("No recent files found for update")
