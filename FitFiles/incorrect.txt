@@ -1,0 +1,31 @@
+nsr2144 incorrect for 10_Min and file path 91284912.fit
+nsr2144 incorrect for 3_Min and file path 91338792.fit
+nsr2144 incorrect for 3_Min and file path 93282736.fit
+nsr2144 incorrect for 3_Min and file path 93954273.fit
+nsr2144 incorrect for 5_Min and file path 91498268.fit
+nsr2144 incorrect for 5_Min and file path 93283255.fit
+nsr2144 incorrect for 5_Min and file path 94036269.fit
+nsr2144 incorrect for 20_Min and file path 91892444.fit
+nsr2144 incorrect for 40_Min and file path 92365595.fit
+ona2107 incorrect for 3_Min and file path 93956137.fit
+ona2107 incorrect for 5_Min and file path 93283263.fit
+ona2107 incorrect for 5_Min and file path tp-5147123.2024-08-31-18-01-35-198Z.GarminPing.AAAAAGbTWn4b6Mre (1).FIT.gz
+ona2107 incorrect for 5_Min and file path 94036289.fit
+ona2107 incorrect for 20_Min and file path 91892442.fit
+ona2107 incorrect for 40_Min and file path 92365590.fit
+av3099 incorrect for 20_Min and file path 91892433.fit
+av3099 incorrect for 40_Min and file path 92366321.fit
+sja2180 incorrect for 3_Min and file path concept2-logbook-workout-93283257.fit
+sja2180 incorrect for 3_Min and file path 91299860.fit
+sja2180 incorrect for 5_Min and file path concept2-logbook-workout-93282741.fit
+sja2180 incorrect for 5_Min and file path 91476891.fit
+sja2180 incorrect for 20_Min and file path 91892467.fit
+sja2180 incorrect for 40_Min and file path 92365588.fit
+akj2147 incorrect for 10_Min and file path 10'JAFF.fit
+akj2147 incorrect for 3_Min and file path 3'JAFF.fit
+akj2147 incorrect for 5_Min and file path 5'JAFF.fit
+akj2147 incorrect for 20_Min and file path 20'JAFF.fit
+akj2147 incorrect for 40_Min and file path 40'JAFF.fit
+Athlete ona2107 had a file tp-5147123.2024-08-31-18-01-35-198Z.GarminPing.AAAAAGbTWn4b6Mre (1).FIT.gz for the workout 5_Min that could not upload successfully. Error: Invalid .FIT File Header
+Athlete ona2107 had a file tp-5147123.2024-08-31-18-01-35-198Z.GarminPing.AAAAAGbTWn4b6Mre (1).FIT.gz for the workout 5_Min that could not upload successfully. Error: Invalid .FIT File Header
+Athlete ona2107 had a file tp-5147123.2024-08-31-18-01-35-198Z.GarminPing.AAAAAGbTWn4b6Mre (1).FIT.gz for the workout 5_Min that could not upload successfully. Error: Invalid .FIT File Header

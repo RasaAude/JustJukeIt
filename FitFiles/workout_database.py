@@ -31,7 +31,6 @@ class WorkoutDatabase:
         df.to_parquet(file_path)
 
     def add_workout(self, athlete_id, workout_type, fit_file_path):
-        
         if fit_file_path.endswith('.fit.gz'):
             # Create a temporary .fit file to store the unzipped contents
             temp_fit_path = fit_file_path.replace('.fit.gz', '.fit')
@@ -42,36 +41,47 @@ class WorkoutDatabase:
                     shutil.copyfileobj(f_in, f_out)
             
             # Use the temporary .fit file for processing
-            fit_file_path = temp_fit_path        
-        # Load and process the FIT file
-        fitfile = FitFile(fit_file_path)
-        records = []
-        for record in fitfile.get_messages('record'):
-            records.append(record.get_values())
-
-        new_df = pd.DataFrame(records)
-        new_df['timestamp'] = pd.to_datetime(new_df['timestamp'])
-        new_df.set_index('timestamp', inplace=True)
-        new_df['Athlete ID'] = athlete_id
-
-        # Add the workout to the database
-        if athlete_id not in self.workouts:
-            self.workouts[athlete_id] = {}
+            fit_file_path = temp_fit_path
         
-        if workout_type in self.workouts[athlete_id]:
-            # Append new workout data to existing dataframe
-            combined_df = pd.concat([self.workouts[athlete_id][workout_type], new_df])
-            # Remove duplicates based on index (timestamp) and all columns
-            combined_df = combined_df.loc[~combined_df.index.duplicated(keep='first')]
-            # Sort the combined dataframe by timestamp
-            combined_df.sort_index(inplace=True)
-            self.workouts[athlete_id][workout_type] = combined_df
-        else:
-            # Create new dataframe for this workout type
-            self.workouts[athlete_id][workout_type] = new_df
+        try:
+            # Load and process the FIT file
+            fitfile = FitFile(fit_file_path)
+            records = []
+            for record in fitfile.get_messages('record'):
+                records.append(record.get_values())
 
-        # Save the updated workout data to a Parquet file
-        self.save_workout(athlete_id, workout_type, self.workouts[athlete_id][workout_type])
+            new_df = pd.DataFrame(records)
+            new_df['timestamp'] = pd.to_datetime(new_df['timestamp'])
+            new_df.set_index('timestamp', inplace=True)
+            new_df['Athlete ID'] = athlete_id
+
+            # Add the workout to the database
+            if athlete_id not in self.workouts:
+                self.workouts[athlete_id] = {}
+            
+            if workout_type in self.workouts[athlete_id]:
+                # Append new workout data to existing dataframe
+                combined_df = pd.concat([self.workouts[athlete_id][workout_type], new_df])
+                # Remove duplicates based on index (timestamp) and all columns
+                combined_df = combined_df.loc[~combined_df.index.duplicated(keep='first')]
+                # Sort the combined dataframe by timestamp
+                combined_df.sort_index(inplace=True)
+                self.workouts[athlete_id][workout_type] = combined_df
+            else:
+                # Create new dataframe for this workout type
+                self.workouts[athlete_id][workout_type] = new_df
+
+            # Save the updated workout data to a Parquet file
+            self.save_workout(athlete_id, workout_type, self.workouts[athlete_id][workout_type])
+        
+        except Exception as e:
+            # Log the error to incorrect.txt
+            print("Athlete "+ athlete_id + "had a file "+ fit_file_path+ "for the workout "+ workout_type+ "that could not upload successfully.")
+            with open('incorrect.txt', 'a') as f:
+                f.write(f"Athlete {athlete_id} had a file {fit_file_path} for the workout {workout_type} that could not upload successfully. Error: {str(e)}\n")
+            
+            # Continue with other files
+            return
 
     def get_workout(self, athlete_id, workout_type):
         return self.workouts.get(athlete_id, {}).get(workout_type)
