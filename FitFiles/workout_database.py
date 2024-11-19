@@ -31,6 +31,7 @@ class WorkoutDatabase:
         df.to_parquet(file_path)
 
     def add_workout(self, athlete_id, workout_type, fit_file_path):
+        original_file_path = fit_file_path
         if fit_file_path.endswith('.fit.gz'):
             # Create a temporary .fit file to store the unzipped contents
             temp_fit_path = fit_file_path.replace('.fit.gz', '.fit')
@@ -73,15 +74,19 @@ class WorkoutDatabase:
 
             # Save the updated workout data to a Parquet file
             self.save_workout(athlete_id, workout_type, self.workouts[athlete_id][workout_type])
+            if original_file_path.endswith(".fit.gz"):
+                try:
+                    os.remove(fit_file_path)
+                    #print(f"Deleted local file: {fit_file_path}")
+                except Exception as e:
+                    print("") #'''f"Error deleting {fit_file_path}: {str(e)}")
         
         except Exception as e:
             # Log the error to incorrect.txt
             print("Athlete "+ athlete_id + "had a file "+ fit_file_path+ "for the workout "+ workout_type+ "that could not upload successfully.")
-            with open('incorrect.txt', 'a') as f:
+            file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'incorrect.txt')
+            with open(file_path, 'a') as f:
                 f.write(f"Athlete {athlete_id} had a file {fit_file_path} for the workout {workout_type} that could not upload successfully. Error: {str(e)}\n")
-            
-            # Continue with other files
-            return
 
     def get_workout(self, athlete_id, workout_type):
         return self.workouts.get(athlete_id, {}).get(workout_type)
