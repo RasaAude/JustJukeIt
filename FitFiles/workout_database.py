@@ -2,6 +2,7 @@ import pandas as pd
 import os
 from fitparse import FitFile
 import gzip
+import glob
 import shutil
 
 class WorkoutDatabase:
@@ -27,7 +28,19 @@ class WorkoutDatabase:
         athlete_dir = os.path.join(self.database_dir, athlete_id)
         if not os.path.exists(athlete_dir):
             os.makedirs(athlete_dir)
-        file_path = os.path.join(athlete_dir, f"{workout_type}.parquet")
+
+        # Find existing files with the same workout type
+        existing_files = glob.glob(os.path.join(athlete_dir, f"{workout_type}_*.parquet"))
+        
+        if not existing_files:
+            # If no existing files, save as workout_type_1.parquet
+            file_number = 1
+        else:
+            # Find the highest number used
+            highest_number = max([int(os.path.splitext(f)[0].split('_')[-1]) for f in existing_files])
+            file_number = highest_number + 1
+
+        file_path = os.path.join(athlete_dir, f"{workout_type}_{file_number}.parquet")
         df.to_parquet(file_path)
 
     def add_workout(self, athlete_id, workout_type, fit_file_path):
@@ -77,13 +90,12 @@ class WorkoutDatabase:
             if original_file_path.endswith(".fit.gz"):
                 try:
                     os.remove(fit_file_path)
-                    #print(f"Deleted local file: {fit_file_path}")
+
                 except Exception as e:
-                    print("") #'''f"Error deleting {fit_file_path}: {str(e)}")
+                    print(f"Error deleting {fit_file_path}: {str(e)}")
         
         except Exception as e:
             # Log the error to incorrect.txt
-            print("Athlete "+ athlete_id + "had a file "+ fit_file_path+ "for the workout "+ workout_type+ "that could not upload successfully.")
             file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'incorrect.txt')
             with open(file_path, 'a') as f:
                 f.write(f"Athlete {athlete_id} had a file {fit_file_path} for the workout {workout_type} that could not upload successfully. Error: {str(e)}\n")
@@ -118,4 +130,20 @@ class WorkoutDatabase:
             end_of_day = start_of_day + pd.Timedelta(days=1) - pd.Timedelta(microseconds=1)
             return workout_df.loc[start_of_day:end_of_day]
         return None
+    
+    def count_workout_files(self):
+        workout_counts = {}
+        for athlete_id in os.listdir(self.database_dir):
+            athlete_dir = os.path.join(self.database_dir, athlete_id)
+            if os.path.isdir(athlete_dir):
+                workout_counts[athlete_id] = {}
+                for file in os.listdir(athlete_dir):
+                    if file.endswith('.parquet'):
+                        workout_type = file.rsplit('.', 1)[0]  # Remove '.parquet'
+                        base_workout_type = '_'.join(workout_type.split('_')[:2])  # Get base workout type
+                        if base_workout_type in workout_counts[athlete_id]:
+                            workout_counts[athlete_id][base_workout_type] += 1
+                        else:
+                            workout_counts[athlete_id][base_workout_type] = 1
+        return workout_counts
 

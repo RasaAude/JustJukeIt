@@ -53,22 +53,7 @@ def list_folders(service, parent_id):
     results = service.files().list(q=query, fields="files(id, name)").execute()
     return results.get('files', [])
 
-def list_files(service, parent_id):
-    query = f"'{parent_id}' in parents and mimeType!='application/vnd.google-apps.folder'"
-    results = service.files().list(q=query, fields="files(id, name)").execute()
-    return results.get('files', [])
 
-def download_file(service, file_id, file_name):
-    request = service.files().get_media(fileId=file_id)
-    fh = io.BytesIO()
-    downloader = MediaIoBaseDownload(fh, request)
-    done = False
-    while done is False:
-        status, done = downloader.next_chunk()
-    fh.seek(0)
-    with open(file_name, 'wb') as f:
-        f.write(fh.read())
-    return file_name
 
 def create_workout_folder(service, folder_name):
     # Get the Workout_Data folder ID
@@ -78,7 +63,7 @@ def create_workout_folder(service, folder_name):
         return None
     # Check if the folder already exists
     if check_folder_exists(service, workout_data_id, folder_name):
-        print(f"Folder '{folder_name}' already exists in Workout_Data.")
+        print(f"Folder '{folder_name}' already exists in Workout_Data.") 
         return None
     
     # Create the new folder
@@ -137,6 +122,29 @@ def check_folder_exists(service, parent_folder_id, folder_name):
     results = service.files().list(q=query, fields='files(id, name)').execute()
     return len(results.get('files', [])) > 0
 
+def list_files(service, parent_id, time_threshold=None):
+    query = f"'{parent_id}' in parents and mimeType!='application/vnd.google-apps.folder'"
+    if time_threshold:
+        query += f" and modifiedTime > '{time_threshold.isoformat()}Z'"
+    results = service.files().list(q=query, fields="files(id, name)").execute()
+    return results.get('files', [])
+
+def download_file(service, file_id, file_name):
+    try:
+        request = service.files().get_media(fileId=file_id)
+        fh = io.BytesIO()
+        downloader = MediaIoBaseDownload(fh, request)
+        done = False
+        while done is False:
+            status, done = downloader.next_chunk()
+        fh.seek(0)
+        with open(file_name, 'wb') as f:
+            f.write(fh.read())
+        return file_name
+    except Exception as e:
+        print(f"Error downloading file {file_name}: {str(e)}")
+        return None
+
 def update_workout_database(service, db):
     workout_data_id = get_folder_id(service, 'Workout_Data')
     if not workout_data_id:
@@ -155,15 +163,18 @@ def update_workout_database(service, db):
 
             for file in all_files:
                 local_file_path = download_file(service, file['id'], file['name'])
-                #print(f"Adding {athlete_id}'s {workout_type} with file path {local_file_path}")
-                db.add_workout(athlete_id, workout_type, local_file_path)
+                if local_file_path:
+                    print(f"Adding {athlete_id}'s {workout_type} with file path {local_file_path}")
+                    db.add_workout(athlete_id, workout_type, local_file_path)
 
-                # Delete the local file immediately after adding to the database
-                try:
-                    os.remove(local_file_path)
-                    #print(f"Deleted local file: {local_file_path}")
-                except Exception as e:
-                    print("")#f"Error deleting {local_file_path}: {str(e)}")
+                    # Delete the local file immediately after adding to the database
+                    try:
+                        os.remove(local_file_path)
+                        print(f"Deleted local file: {local_file_path}")
+                    except Exception as e:
+                        print(f"Error deleting {local_file_path}: {str(e)}")
+                else:
+                    print(f"Skipping file {file['name']} due to download error")
 
     print("Workout database updated successfully")
 

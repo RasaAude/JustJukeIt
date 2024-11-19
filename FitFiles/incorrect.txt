@@ -1,3 +1,6 @@
+Athlete jrb2299 had a file tp-4578057.2024-11-12-23-04-44-945Z.GarminPing.AAAAAGcz3wxvDEI1 (1).FIT.gz for the workout 3_Min that could not upload successfully. Error: Invalid .FIT File Header
+Athlete jrb2299 had a file tp-4578057.2024-11-15-00-53-05-375Z.GarminPing.AAAAAGc2m3ER2iDE (1).FIT.gz for the workout 5_Min that could not upload successfully. Error: Invalid .FIT File Header
+Athlete jrb2299 had a file tp-4578057.2024-09-27-21-23-33-373Z.GarminPing.AAAAAGb3IlVUfHnQ (1).FIT.gz for the workout 40_Min that could not upload successfully. Error: Invalid .FIT File Header
 Athlete jpd2208 had a file 5FDE291B-014C-48B2-AAF8-DDA36A8FEFD8 (1).jpeg for the workout 10_Min that could not upload successfully. Error: Invalid .FIT File Header
-Athlete mc5517 had a file F5545542-DB72-4575-A815-684758FCB8BD.jpeg for the workout 10_Min that could not upload successfully. Error: Invalid .FIT File Header
-Athlete mc5517 had a file 206D3BF6-0914-4A4E-BF95-868B08B730A4.jpeg for the workout 3_Min that could not upload successfully. Error: Invalid .FIT File Header
+Athlete nsr2144 had a file 93282736.fit for the workout 3_Min that could not upload successfully. Error: ('cannot mix list and non-list, non-null values', 'Conversion failed for column enhanced_speed with type object')
+Athlete nsr2144 had a file 93954273.fit for the workout 3_Min that could not upload successfully. Error: ('cannot mix list and non-list, non-null values', 'Conversion failed for column enhanced_speed with type object')
